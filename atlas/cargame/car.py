@@ -123,7 +123,7 @@ class Car:
         """
 
         # Calculate the turning radius
-        wheelebase = 
+        wheelebase = ...
         # Calculate ICR
 
 
