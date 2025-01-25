@@ -53,13 +53,49 @@ class Car:
         self.positon = Vector()
 
     def get_state(self) -> dict:
+        """
+        Gets the current state of the car.
+
+        Returns
+        -------
+        dict
+            Returns the following dictionary:
+            {
+                'Grid': np.ndarray,
+                'CarPosition': np.ndarray # [x: float, y: float]
+                'CarSpeed': float,
+                'CarAngle': float,
+                'TireAngle': float
+            }
+        """
         raise NotImplementedError()
 
     def drive(self, speed: float) -> None:
-        self.speed = speed
+        """
+        Sets the current speed of the car.
+
+        Parameters
+        ----------
+        speed : float
+            A float between 0 and 1 to indicate how fast the back tires should spin. 
+            0 is stopped, 1 is the fastest they can possibly spin.
+        """
+
+        self.speed = speed * self.max_speed
 
     def turn(self, angle: float) -> None:
-        self.front_tire_angle = angle
+        """
+        Sets the angle of the car
+
+        Parameters
+        ----------
+        angle : float
+            _description_
+        """
+        self.front_tire_angle = angle * self.max_turn_angle
 
     def update(self) -> None:
         self.position += self.speed
+
+    def reset(self) -> None:
+        self._initialize()
