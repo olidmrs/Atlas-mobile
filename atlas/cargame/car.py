@@ -17,7 +17,9 @@ class Car:
             max_speed: int, 
             max_tire_angle: int,
             track: Track,
-            timestep: float
+            timestep: float,
+            front_tire_relative_position: Vector,
+            back_right_tire_relative_position: Vector
             ) -> None:
         """
         Initializes the car.
@@ -37,6 +39,10 @@ class Car:
             The track object containing the track data, and the start location.
         timestep: float
             The number of seconds between each update.
+        front_tire_relative_position: Vector
+            The front tire position relative to the absolute center of the car (in cm).
+        back_right_tire_relative_position: Vector
+            The right back tire position relative to the absolute center of the car (in cm).
         """
         
         # Define properties
@@ -46,6 +52,9 @@ class Car:
         self.max_tire_angle = max_tire_angle
         self.track = track
         self.timestep = timestep
+        self.front_right_tire_position = front_tire_relative_position
+        self.back_right_tire_position = back_right_tire_relative_position
+        self.back_left_tire_position = self.back_right_tire_position.copy()
 
         # Initialize
         self._initialize()
@@ -81,7 +90,7 @@ class Car:
             'TireAngle': self.tire_angle / self.max_tire_angle
         }
 
-    def drive(self, speed: float) -> None:
+    def set_speed(self, speed: float) -> None:
         """
         Sets the current speed of the car.
 
@@ -94,7 +103,7 @@ class Car:
 
         self.speed = speed * self.max_speed
 
-    def turn(self, angle: float) -> None:
+    def set_front_tire_angle(self, angle: float) -> None:
         """
         Sets the angle of the car to some angle between -max_tire_angle and max_tire_angle
 
@@ -112,6 +121,11 @@ class Car:
         and speed. For example, if the speed is 10cm/sec and the car angle is 90 (straight up) and the timestep is 1 second,
         the car will be 10cm straight up at the end of this function.
         """
+
+        # Calculate the turning radius
+        wheelebase = 
+        # Calculate ICR
+
 
         self.reward -= 1
         # TODO: Update the position and the angle of the car given the current tire angle and speed
