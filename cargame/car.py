@@ -2,6 +2,7 @@ from . import Track
 import numpy as np
 
 
+
 class Vector:
     def __init__(self, x: float, y: float):
         self.x = x
