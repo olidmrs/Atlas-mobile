@@ -1,23 +1,22 @@
 from . import Track
+from vector import Vector
 import numpy as np
 
-
-class Vector:
-    def __init__(self, x: float, y: float):
-        self.x = x
-        self.y = y
 
 class Car:
 
     UP_ANGLE = 90
+    MAX_CAR_ANGLE = 360
+    START_REWARD = 360
 
     def __init__(
             self, 
             body_width: float, 
             body_length: float, 
             max_speed: int, 
-            max_turn_angle: int,
-            track: Track
+            max_tire_angle: int,
+            track: Track,
+            timestep: float
             ) -> None:
         """
         Initializes the car.
@@ -31,26 +30,31 @@ class Car:
             (including the tires if the tires contribute to the length)
         max_speed : int
             The maximum speed the car can reach. This is the real life speed of the car in cm/second.
-        max_turn_angle : int
+        max_tire_angle : int
             The maximum turning angle of the front tire of the car. (The maximum angle the tire can deviate from straight forward)
         track : Track
             The track object containing the track data, and the start location.
+        timestep: float
+            The number of seconds between each update.
         """
         
         # Define properties
         self.body_width = body_width
         self.body_width = body_length
         self.max_speed = max_speed
-        self.max_turn_angle = max_turn_angle
+        self.max_tire_angle = max_tire_angle
         self.track = track
+        self.timestep = timestep
 
         # Initialize
-        self.initialize()
+        self._initialize()
 
     def _initialize(self) -> None:
-        self.current_speed = 0
+        self.speed = 0
+        self.positon = self.track.start_position
         self.angle = Car.UP_ANGLE
-        self.positon = Vector()
+        self.tire_angle = 0
+        self.reward = Car.START_REWARD
 
     def get_state(self) -> dict:
         """
@@ -68,7 +72,13 @@ class Car:
                 'TireAngle': float
             }
         """
-        raise NotImplementedError()
+        return {
+            'Grid': self.track.get_state(),
+            'CarPosition': np.ndarray([self.position.x, self.position.y]),
+            'CarSpeed': self.speed,
+            'CarAngle': self.angle / ,
+            'TireAngle': self.tire_angle / self.max_tire_angle
+        }
 
     def drive(self, speed: float) -> None:
         """
@@ -85,26 +95,44 @@ class Car:
 
     def turn(self, angle: float) -> None:
         """
-        Sets the angle of the car to some angle between -max_turn_angle and max_turn_angle
+        Sets the angle of the car to some angle between -max_tire_angle and max_tire_angle
 
         Parameters
         ----------
         angle : float
-            _description_
+            A float between -1 and 0, which will be mapped to the maximum turn angle.
         """
-        self.front_tire_angle = angle * self.max_turn_angle
+        self.front_tire_angle = angle * self.max_tire_angle
 
     def update(self) -> None:
-        self.position += self.speed
+        """
+        Updates the angle and position based on the current speed and tire angle. The position and car angle at the end
+        of this method is the position and angle the car would be in after one timestep elapsing with the current tire angle
+        and speed. For example, if the speed is 10cm/sec and the car angle is 90 (straight up) and the timestep is 1 second,
+        the car will be 10cm straight up at the end of this function.
+        """
+
+        self.reward -= 1
+        # TODO: Update the position and the angle of the car given the current tire angle and speed
+        raise NotImplementedError()
 
     def reset(self) -> None:
+        """
+        Resets the car back to the initial position and state.
+        """
         self._initialize()
 
     def get_reward(self) -> None:
-        raise NotImplementedError()
+        return self.reward
     
     def check_if_terminated(self) -> bool:
-        raise NotImplementedError()
+        return self._is_in_track()
     
     def check_if_done(self) -> bool:
+        return self._is_overlapping_with_end_mark()
+    
+    def _is_in_track(self) -> bool:
+        raise NotImplementedError()
+    
+    def _is_overlapping_with_end_mark() -> bool:
         raise NotImplementedError()
