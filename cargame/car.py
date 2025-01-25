@@ -85,7 +85,7 @@ class Car:
 
     def turn(self, angle: float) -> None:
         """
-        Sets the angle of the car
+        Sets the angle of the car to some angle between -max_turn_angle and max_turn_angle
 
         Parameters
         ----------
@@ -99,3 +99,12 @@ class Car:
 
     def reset(self) -> None:
         self._initialize()
+
+    def get_reward(self) -> None:
+        raise NotImplementedError()
+    
+    def check_if_terminated(self) -> bool:
+        raise NotImplementedError()
+    
+    def check_if_done(self) -> bool:
+        raise NotImplementedError()
