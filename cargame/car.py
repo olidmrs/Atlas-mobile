@@ -77,7 +77,7 @@ class Car:
             'Grid': self.track.get_state(),
             'CarPosition': np.ndarray([self.position.x, self.position.y]),
             'CarSpeed': self.speed,
-            'CarAngle': self.angle / ,
+            'CarAngle': self.angle / 360,
             'TireAngle': self.tire_angle / self.max_tire_angle
         }
 
