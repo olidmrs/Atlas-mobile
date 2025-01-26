@@ -1,5 +1,6 @@
 import numpy as np
-from vector import Vector
+from .vector import Vector
+
 class Track:
     def __init__(
             self,

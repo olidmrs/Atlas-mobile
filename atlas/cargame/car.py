@@ -1,5 +1,5 @@
 from . import Track
-from vector import Vector
+from .vector import Vector
 import numpy as np
 import math
 
@@ -63,7 +63,7 @@ class Car:
 
     def _initialize(self) -> None:
         self.speed = 0
-        self.positon = self.track.start_position()
+        self.position = self.track.get_start_position()
         self.angle = Car.UP_ANGLE
         self.tire_angle = 0
         self.reward = Car.START_REWARD
@@ -112,7 +112,7 @@ class Car:
         Parameters
         ----------
         angle : float
-            A float between -1 and 0, which will be mapped to the maximum turn angle.
+            A float between -1 and 1, which will be mapped to the maximum turn angle.
         """
         self.front_tire_angle = angle * self.max_tire_angle
 
@@ -162,7 +162,7 @@ class Car:
             )
         
         circle_center = center_of_back_wheels + offset
-        new_back_tire_positon = circle_center + position_offset_from_circle_center_to_back_tires
+        new_back_tire_position = circle_center + position_offset_from_circle_center_to_back_tires
         
         # Calculate the new car angle
         parallel_line_angle = new_position_on_circle_in_degrees + 90
@@ -199,13 +199,13 @@ class Car:
                 y_direction = -1
 
         slope_of_car = math.tan(math.radians(parallel_line_angle))
-        x_diff = (self.body_length / 2) / math.sqrt(slope_of_car ** 2 + 1)
-        y_diff = abs(slope_of_car * x_diff) 
+        x_diff = (self.back_left_tire_position.y / 2) / math.sqrt(slope_of_car ** 2 + 1)
+        y_diff = abs(slope_of_car * x_diff)
 
         x_diff = x_diff * x_direction
         y_diff = y_diff * y_direction
 
-        self.position = new_back_tire_positon +  Vector(x_diff, y_diff)
+        self.position = new_back_tire_position +  Vector(x_diff, y_diff)
 
         self.reward -= 1
 
@@ -219,7 +219,7 @@ class Car:
         return self.reward
     
     def check_if_terminated(self) -> bool:
-        return self._is_in_track()
+        return not self._is_in_track()
     
     def check_if_done(self) -> bool:
         return self._is_overlapping_with_end_mark()
