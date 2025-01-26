@@ -1,5 +1,5 @@
 import numpy as np
-from vector import Vector
+from .vector import Vector
 
 class Track:
     BAD_TILE = (0, 0, 0)
