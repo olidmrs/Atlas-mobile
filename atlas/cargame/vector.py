@@ -5,3 +5,9 @@ class Vector:
 
     def copy(self) -> "Vector":
         return Vector(self.x, self.y)
+    
+    def __add__(self, o: "Vector") -> "Vector":
+        return Vector(self.x + o.x, self.y + o.y)
+    
+    def __truediv__(self, divisor: float) -> "Vector":
+        return Vector(self.x / divisor, self.y / divisor)

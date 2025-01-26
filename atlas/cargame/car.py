@@ -1,6 +1,7 @@
 from . import Track
 from vector import Vector
 import numpy as np
+import math
 
 
 
@@ -47,7 +48,7 @@ class Car:
         
         # Define properties
         self.body_width = body_width
-        self.body_width = body_length
+        self.body_length = body_length
         self.max_speed = max_speed
         self.max_tire_angle = max_tire_angle
         self.track = track
@@ -55,6 +56,7 @@ class Car:
         self.front_right_tire_position = front_tire_relative_position
         self.back_right_tire_position = back_right_tire_relative_position
         self.back_left_tire_position = self.back_right_tire_position.copy()
+        self.wheelebase = front_tire_relative_position.y - back_right_tire_relative_position.y
 
         # Initialize
         self._initialize()
@@ -123,13 +125,89 @@ class Car:
         """
 
         # Calculate the turning radius
-        wheelebase = ...
-        # Calculate ICR
+        turning_radius = abs(self.wheelebase / math.tan(math.radians(self.front_tire_angle)))
 
+        # Calculate Instantaneous Center of Rotation (ICR)
+        center_of_back_wheels = (self.back_left_tire_position + self.back_right_tire_position) / 2
+
+        # If tire angle is positive, subtract 180 and add the absolute value of angle
+        if self.tire_angle > 0:
+            angle_facing_center_of_rotation = self.angle - (Car.MAX_CAR_ANGLE / 2) + self.tire_angle
+        # If tire angle is negative, add 180 and subtract absolute value of angle
+        else:
+            angle_facing_center_of_rotation = self.angle + (Car.MAX_CAR_ANGLE / 2) + self.tire_angle 
+
+        # Find the offset from the car where the center of rotation should be
+        offset = Vector(
+            math.cos(angle_facing_center_of_rotation) * turning_radius,
+            math.sin(angle_facing_center_of_rotation) * turning_radius
+        )
+
+        # Draw a circle from the center of rotation, find the potition which is speed * timestep
+        position_on_circle_in_degrees = math.degrees(math.atan2(
+            -offset.y,
+            -offset.x
+            ))
+        
+        # Find the difference between the current angle and the angle on the circle we should be at after driving
+        angle_difference = math.degrees((self.speed * self.timestep) / turning_radius)
+        # If he's turning right, subtract the angle instead of adding
+        if self.tire_angle > 0:
+            angle_difference *= -1
+
+        new_position_on_circle_in_degrees = position_on_circle_in_degrees + angle_difference
+        position_offset_from_circle_center_to_back_tires = Vector(
+            turning_radius * math.cos(math.radians(new_position_on_circle_in_degrees)),
+            turning_radius * math.sin(math.radians(new_position_on_circle_in_degrees))
+            )
+        
+        circle_center = center_of_back_wheels + offset
+        new_back_tire_positon = circle_center + position_offset_from_circle_center_to_back_tires
+        
+        # Calculate the new car angle
+        parallel_line_angle = new_position_on_circle_in_degrees + 90
+        # If car is turning to the right, subtract 180 from the angle (trust me it should work)
+        if self.tire_angle > 0:
+            parallel_line_angle -= 180
+
+        self.angle = parallel_line_angle
+        while self.angle >= 360:
+            self.angle -= 360
+
+        # Get direction of x-axis for the car's facing direction
+        if self.angle < 180:
+            if self.tire_angle < 0:
+                x_direction = -1
+            else:
+                x_direction = 1
+        else:
+            if self.tire_angle < 0:
+                x_direction = 1
+            else:
+                x_direction = -1
+
+        # Get direction of y-axis for the car's facing direction
+        if self.angle > 90 and self.angle < 270:
+            if self.tire_angle < 0:
+                y_direction = -1
+            else:
+                y_direction = 1
+        else:
+            if self.tire_angle < 0:
+                y_direction = 1
+            else:
+                y_direction = -1
+
+        slope_of_car = math.tan(math.radians(parallel_line_angle))
+        x_diff = (self.body_length / 2) / math.sqrt(slope_of_car ** 2 + 1)
+        y_diff = abs(slope_of_car * x_diff) 
+
+        x_diff = x_diff * x_direction
+        y_diff = y_diff * y_direction
+
+        self.position = new_back_tire_positon +  Vector(x_diff, y_diff)
 
         self.reward -= 1
-        # TODO: Update the position and the angle of the car given the current tire angle and speed
-        raise NotImplementedError()
 
     def reset(self) -> None:
         """
