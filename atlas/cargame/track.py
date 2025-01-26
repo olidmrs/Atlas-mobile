@@ -2,18 +2,25 @@ import numpy as np
 from .vector import Vector
 
 class Track:
+    BAD_TILE = (0, 0, 0)
+    START_TILE = (255, 0, 0)
+    END_TILE = (0, 255, 0)
+    ROAD_TILE = (0, 0, 0)
+
     def __init__(
             self,
             pixels : np.ndarray
     ):
         self.pixels = pixels
-    
-    def get_start_position(self) -> Vector:
-        """
-        Looks through the pixels and finds the pixels which are rgb(255, 0, 0) and finds the start point associated with them
-        Returns the (x,y) position as a vector.
-        """
-        
+        red_pixels = self.get_red_pixel_list()
+        y_pixels = [pix.y for pix in red_pixels]
+        x_pixels = [pix.x for pix in red_pixels]
+
+        car_height = max(y_pixels) - min(y_pixels)
+        car_width = max(x_pixels) - min(x_pixels)
+        self.car_dimensions = Vector(car_width, car_height)
+
+    def get_red_pixel_list(self) -> list[Vector]:
         x_positions = []
         y_positions = []
         for i in range(0, len(self.pixels)):
@@ -21,10 +28,18 @@ class Track:
                 if self.pixels[i][j] == (255, 0, 0):
                     x_positions.append(i)
                     y_positions.append(len(self.pixels -1 - i))
-        return Vector((min(y_positions) + max(y_positions)) / 2, (min(x_positions) + max(x_positions)) / 2)
 
-        # self.pixels[0][0] -> (r, g, b): (int, int, int)
-        pass
+        return [Vector(x, y) for x, y in zip(x_positions, y_positions)]
+
+    def get_start_position(self) -> Vector:
+        """
+        Looks through the pixels and finds the pixels which are rgb(255, 0, 0) and finds the start point associated with them
+        Returns the (x,y) position as a vector.
+        """
+        red_pixels = self.get_red_pixel_list()
+        y_positions = [pix.y for pix in red_pixels]
+        x_positions = [pix.x for pix in red_pixels]
+        return Vector((min(y_positions) + max(y_positions)) / 2, (min(x_positions) + max(x_positions)) / 2)
 
     def get_state(self) -> np.ndarray:
         """
