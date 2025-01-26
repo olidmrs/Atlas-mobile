@@ -9,7 +9,7 @@ class Car:
 
     UP_ANGLE = 90
     MAX_CAR_ANGLE = 360
-    START_REWARD = 360
+    START_REWARD = 5
 
     def __init__(
             self, 
@@ -60,22 +60,23 @@ class Car:
 
         # Initialize
         self._initialize()
+        self.reward = 5
 
     def _initialize(self) -> None:
         self.speed = 0
-        self.position = self.track.get_get_start_position()
+        self.position = self.track.get_start_position()
         self.angle = Car.UP_ANGLE
         self.tire_angle = 0
         self.reward = Car.START_REWARD
 
-    def get_state(self) -> list:
+    def get_state(self) -> np.ndarray:
         """
         Gets the current state of the car.
 
         Returns
         -------
-        list
-            Returns a list of data
+        np.darray
+            Returns a numpy array of data
         """
         
         output = []
@@ -91,7 +92,7 @@ class Car:
         output.append(self.angle / 360)
         output.append(self.tire_angle / self.max_tire_angle)
 
-        return output
+        return np.array(output).astype(np.float32)
 
         # return np.array[
         #     'Grid': flattened_pixels,
@@ -137,7 +138,7 @@ class Car:
         turning_radius = abs(self.wheelebase / math.tan(math.radians(self.front_tire_angle)))
 
         # Calculate Instantaneous Center of Rotation (ICR)
-        center_of_back_wheels = (self.back_left_tire_position + self.back_right_tire_position) / 2
+        center_of_back_wheels = self.position + (self.back_left_tire_position + self.back_right_tire_position) / 2
 
         # If tire angle is positive, subtract 180 and add the absolute value of angle
         if self.tire_angle > 0:
@@ -215,6 +216,8 @@ class Car:
         y_diff = y_diff * y_direction
 
         self.position = new_back_tire_position +  Vector(x_diff, y_diff)
+        self.position.x = max(self.position.x, 0)
+        self.position.y = max(self.position.y, 0)
 
         self.reward -= 1
 
@@ -228,7 +231,8 @@ class Car:
         return self.reward
     
     def check_if_terminated(self) -> bool:
-        return not self._is_in_track()
+        print(self._is_in_track())
+        return not self._is_in_track() or self.reward <= 0
     
     def check_if_done(self) -> bool:
         return self._is_overlapping_with_end_mark()
@@ -248,8 +252,10 @@ class Car:
 
         for x_offset in (-self.track.car_dimensions.x // 2, self.track.car_dimensions.x // 2):
             for y_offset in (-self.track.car_dimensions.y // 2, self.track.car_dimensions.y // 2):
-                if pixels[car_position_in_pixels.y+y_offset][car_position_in_pixels.x+x_offset] == Track.BAD_TILE:
-                    return False
+                if car_position_in_pixels.y+y_offset < pixels.shape[0] and car_position_in_pixels.y+y_offset >= 0 \
+                        and car_position_in_pixels.x+x_offset < pixels.shape[1] and car_position_in_pixels.x+x_offset >= 0:
+                    if Track.pix_equal(pixels[car_position_in_pixels.y+y_offset][car_position_in_pixels.x+x_offset], Track.BAD_TILE):
+                        return False
         
         return True
 
@@ -269,7 +275,9 @@ class Car:
 
         for x_offset in range(-self.track.car_dimensions.x // 2, self.track.car_dimensions.x // 2+1):
             for y_offset in range(-self.track.car_dimensions.y // 2, self.track.car_dimensions.y // 2+1):
-                if pixels[car_position_in_pixels.y+y_offset][car_position_in_pixels.x+x_offset] == Track.END_TILE:
-                    return True
+                if car_position_in_pixels.y+y_offset < pixels.shape[0] and car_position_in_pixels.y+y_offset >= 0 \
+                        and car_position_in_pixels.x+x_offset < pixels.shape[1] and car_position_in_pixels.x+x_offset >= 0:
+                    if Track.pix_equal(pixels[car_position_in_pixels.y+y_offset][car_position_in_pixels.x+x_offset], Track.END_TILE):
+                        return True
                 
         return False
