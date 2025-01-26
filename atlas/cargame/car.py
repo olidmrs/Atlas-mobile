@@ -68,21 +68,14 @@ class Car:
         self.tire_angle = 0
         self.reward = Car.START_REWARD
 
-    def get_state(self) -> dict:
+    def get_state(self) -> list:
         """
         Gets the current state of the car.
 
         Returns
         -------
-        dict
-            Returns the following dictionary:
-            {
-                'Grid': np.ndarray,
-                'CarPosition': np.ndarray # [x: float, y: float]
-                'CarSpeed': float,
-                'CarAngle': float,
-                'TireAngle': float
-            }
+        list
+            Returns a list of data
         """
         
         output = []
