@@ -52,7 +52,7 @@ class Car:
 
     def _initialize(self) -> None:
         self.speed = 0
-        self.positon = self.track.start_position
+        self.positon = self.track.start_position()
         self.angle = Car.UP_ANGLE
         self.tire_angle = 0
         self.reward = Car.START_REWARD
