@@ -46,7 +46,7 @@ class Track:
         red_pixels = self.get_start_pixel_list()
         y_positions = [pix.y for pix in red_pixels]
         x_positions = [pix.x for pix in red_pixels]
-        return Vector((min(y_positions) + max(y_positions)) / 2, (min(x_positions) + max(x_positions)) / 2)
+        return Vector(((min(x_positions) + max(x_positions)) // 2), (min(y_positions) + max(y_positions)) // 2)
 
     def get_state(self) -> np.ndarray:
         """

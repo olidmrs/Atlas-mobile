@@ -11,3 +11,9 @@ class Vector:
     
     def __truediv__(self, divisor: float) -> "Vector":
         return Vector(self.x / divisor, self.y / divisor)
+    
+    def __mul__(self, mul: float) -> "Vector":
+        return Vector(self.x * mul, self.y * mul)
+    
+    def __repr__(self):
+        return f"({self.x}, {self.y})"
