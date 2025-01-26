@@ -9,7 +9,7 @@ class Car:
 
     UP_ANGLE = 90
     MAX_CAR_ANGLE = 360
-    START_REWARD = 5
+    START_REWARD = 200
 
     def __init__(
             self, 
@@ -63,9 +63,16 @@ class Car:
         self._initialize()
         self.reward = 5
 
+    def get_pixel_position(self) -> Vector:
+        return Vector(
+            int(self.position.x * self.pixels_per_cm),
+            int(self.track.pixels.shape[0] - (self.position.y * self.pixels_per_cm) - 1)
+            )
+
     def _initialize(self) -> None:
         self.speed = 0
-        self.position = self.track.get_start_position() / self.pixels_per_cm
+        pixel_position = self.track.get_start_position()
+        self.position = Vector(pixel_position.x, self.track.pixels.shape[0] - pixel_position.y - 1) / self.pixels_per_cm
         self.angle = Car.UP_ANGLE
         self.tire_angle = 0
         self.reward = Car.START_REWARD
@@ -244,10 +251,7 @@ class Car:
         half_car_dimensions = self.track.car_dimensions / 2
         half_car_dimensions.x, half_car_dimensions.y = int(half_car_dimensions.x), int(half_car_dimensions.y)
         # Get car position in the pixel indices
-        car_position_in_pixels = Vector(
-            int(self.position.x * self.pixels_per_cm),
-            int(len(self.track.pixels) - (self.position.y * self.pixels_per_cm) - 1)
-        )
+        car_position_in_pixels = self.get_pixel_position()
 
         for x_offset in (-self.track.car_dimensions.x // 2, self.track.car_dimensions.x // 2):
             for y_offset in (-self.track.car_dimensions.y // 2, self.track.car_dimensions.y // 2):
@@ -266,10 +270,7 @@ class Car:
         half_car_dimensions = self.track.car_dimensions / 2
         half_car_dimensions.x, half_car_dimensions.y = int(half_car_dimensions.x), int(half_car_dimensions.y)
         # Get car position in the pixel indices
-        car_position_in_pixels = Vector(
-            int(self.position.x * self.pixels_per_cm),
-            int(len(self.track.pixels) - (self.position.y * self.pixels_per_cm) - 1)
-        )
+        car_position_in_pixels = self.get_pixel_position()
 
         for x_offset in range(-self.track.car_dimensions.x // 2, self.track.car_dimensions.x // 2+1):
             for y_offset in range(-self.track.car_dimensions.y // 2, self.track.car_dimensions.y // 2+1):
