@@ -63,7 +63,7 @@ class Car:
 
     def _initialize(self) -> None:
         self.speed = 0
-        self.positon = self.track.start_position
+        self.positon = self.track.start_position()
         self.angle = Car.UP_ANGLE
         self.tire_angle = 0
         self.reward = Car.START_REWARD
@@ -175,7 +175,7 @@ class Car:
             self.angle -= 360
 
         # Get direction of x-axis for the car's facing direction
-        if self.angle < 180:
+        if new_position_on_circle_in_degrees < 180:
             if self.tire_angle < 0:
                 x_direction = -1
             else:
@@ -187,7 +187,7 @@ class Car:
                 x_direction = -1
 
         # Get direction of y-axis for the car's facing direction
-        if self.angle > 90 and self.angle < 270:
+        if new_position_on_circle_in_degrees > 90 and new_position_on_circle_in_degrees < 270:
             if self.tire_angle < 0:
                 y_direction = -1
             else:
