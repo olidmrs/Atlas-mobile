@@ -85,13 +85,28 @@ class Car:
             }
         """
         
-        return {
-            'Grid': self.track.get_state(),
-            'CarPosition': np.ndarray([self.position.x, self.position.y]),
-            'CarSpeed': self.speed,
-            'CarAngle': self.angle / 360,
-            'TireAngle': self.tire_angle / self.max_tire_angle
-        }
+        output = []
+        for row in self.track.pixels:
+            for pix in row:
+                output.append(pix[0])
+                output.append(pix[1])
+                output.append(pix[2])
+
+        output.append(self.position.x)
+        output.append(self.position.y)
+        output.append(self.speed / self.max_speed)
+        output.append(self.angle / 360)
+        output.append(self.tire_angle / self.max_tire_angle)
+
+        return output
+
+        # return np.array[
+        #     'Grid': flattened_pixels,
+        #     'CarPosition': np.ndarray([self.position.x, self.position.y]),
+        #     'CarSpeed': self.speed,
+        #     'CarAngle': self.angle / 360,
+        #     'TireAngle': self.tire_angle / self.max_tire_angle
+        # ]
 
     def set_speed(self, speed: float) -> None:
         """
