@@ -63,7 +63,7 @@ class Car:
 
     def _initialize(self) -> None:
         self.speed = 0
-        self.positon = self.track.start_position()
+        self.positon = self.track.get_start_position()
         self.angle = Car.UP_ANGLE
         self.tire_angle = 0
         self.reward = Car.START_REWARD
@@ -84,6 +84,7 @@ class Car:
                 'TireAngle': float
             }
         """
+        
         return {
             'Grid': self.track.get_state(),
             'CarPosition': np.ndarray([self.position.x, self.position.y]),
@@ -226,7 +227,24 @@ class Car:
     
     def _is_in_track(self) -> bool:
         pixels = self.track.pixels
+        
+        # Check if the pixel is within the car's hitbox
+        half_car_dimensions = self.track.car_dimensions / 2
+        half_car_dimensions.x, half_car_dimensions.y = int(half_car_dimensions.x), int(half_car_dimensions.y)
+        # Get car position in the pixel indices
+        pixels_per_cm = self.track.car_dimensions.y / self.body_length
+        car_position_in_pixels = Vector(
+            int(self.position.x * pixels_per_cm),
+            int(len(self.track.pixels) - (self.position.y * pixels_per_cm) - 1)
+        )
 
-    
+        for x_offset in (-self.track.car_dimensions.x // 2, self.track.car_dimensions.x // 2):
+            for y_offset in (-self.track.car_dimensions.y // 2, self.track.car_dimensions.y // 2):
+                if pixels[car_position_in_pixels.y+y_offset][car_position_in_pixels.x+x_offset] == Track.BAD_TILE:
+                    return False
+        
+        return True
+
+
     def _is_overlapping_with_end_mark(self) -> bool:
         pixels = self.track.pixels
