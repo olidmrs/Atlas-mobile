@@ -225,7 +225,8 @@ class Car:
         return self._is_overlapping_with_end_mark()
     
     def _is_in_track(self) -> bool:
-        raise NotImplementedError()
+        pixels = self.track.pixels
+
     
-    def _is_overlapping_with_end_mark() -> bool:
-        raise NotImplementedError()
+    def _is_overlapping_with_end_mark(self) -> bool:
+        pixels = self.track.pixels
