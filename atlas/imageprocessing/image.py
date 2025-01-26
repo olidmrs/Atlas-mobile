@@ -16,7 +16,7 @@ def transform_image(image : str) -> np.ndarray:
     blue_lower = np.array([0, 0, 50])
     blue_upper = np.array([100, 100, 255])
     red_lower = np.array([80, 0, 0])
-    red_upper = np.array([255, 100, 100])
+    red_upper = np.array([255, 60, 60])
     green_lower = np.array([0, 50, 0])
     green_upper = np.array([80, 255, 80])
     road_mask = np.all((image >= blue_lower) & (image <= blue_upper), axis=-1).astype(np.uint8)
