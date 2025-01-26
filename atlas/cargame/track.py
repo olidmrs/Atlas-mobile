@@ -12,7 +12,7 @@ class Track:
             pixels : np.ndarray
     ):
         self.pixels = pixels
-        red_pixels = self.get_red_pixel_list()
+        red_pixels = self.get_start_pixel_list()
         y_pixels = [pix.y for pix in red_pixels]
         x_pixels = [pix.x for pix in red_pixels]
 
@@ -20,12 +20,16 @@ class Track:
         car_width = max(x_pixels) - min(x_pixels)
         self.car_dimensions = Vector(car_width, car_height)
 
-    def get_red_pixel_list(self) -> list[Vector]:
+    def pix_equal(pix: list[int], other: list[int]) -> bool:
+        return pix[0] == other[0] and pix[1] == other[1] and pix[2] == other[2]
+
+    def get_start_pixel_list(self) -> list[Vector]:
         x_positions = []
         y_positions = []
         for i in range(0, len(self.pixels)):
             for j in range(0, len(self.pixels)):
-                if self.pixels[i][j] == (255, 0, 0):
+                pix = self.pixels[i][j]
+                if self.pix_equal(pix, Track.START_TILE):
                     x_positions.append(i)
                     y_positions.append(len(self.pixels -1 - i))
 
@@ -36,7 +40,7 @@ class Track:
         Looks through the pixels and finds the pixels which are rgb(255, 0, 0) and finds the start point associated with them
         Returns the (x,y) position as a vector.
         """
-        red_pixels = self.get_red_pixel_list()
+        red_pixels = self.get_start_pixel_list()
         y_positions = [pix.y for pix in red_pixels]
         x_positions = [pix.x for pix in red_pixels]
         return Vector((min(y_positions) + max(y_positions)) / 2, (min(x_positions) + max(x_positions)) / 2)
@@ -54,7 +58,8 @@ class Track:
         green_pixel_list = []
         for i in range(0, len(self.pixels)):
             for j in range(0, len(self.pixels)):
-                if self.pixels[i][j] == (0, 255, 0):
+                print(self.pixels[i][j])
+                if self.pix_equal(self.pixels[i][j], Track.END_TILE):
                     green_pixel_list.append(Vector(j, len(self.pixels) - 1 - i))
         return green_pixel_list
         

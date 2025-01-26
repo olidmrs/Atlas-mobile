@@ -68,30 +68,38 @@ class Car:
         self.tire_angle = 0
         self.reward = Car.START_REWARD
 
-    def get_state(self) -> dict:
+    def get_state(self) -> list:
         """
         Gets the current state of the car.
 
         Returns
         -------
-        dict
-            Returns the following dictionary:
-            {
-                'Grid': np.ndarray,
-                'CarPosition': np.ndarray # [x: float, y: float]
-                'CarSpeed': float,
-                'CarAngle': float,
-                'TireAngle': float
-            }
+        list
+            Returns a list of data
         """
         
-        return {
-            'Grid': self.track.get_state(),
-            'CarPosition': np.ndarray([self.position.x, self.position.y]),
-            'CarSpeed': self.speed,
-            'CarAngle': self.angle / 360,
-            'TireAngle': self.tire_angle / self.max_tire_angle
-        }
+        output = []
+        for row in self.track.pixels:
+            for pix in row:
+                output.append(pix[0])
+                output.append(pix[1])
+                output.append(pix[2])
+
+        output.append(self.position.x)
+        output.append(self.position.y)
+        output.append(self.speed / self.max_speed)
+        output.append(self.angle / 360)
+        output.append(self.tire_angle / self.max_tire_angle)
+
+        return output
+
+        # return np.array[
+        #     'Grid': flattened_pixels,
+        #     'CarPosition': np.ndarray([self.position.x, self.position.y]),
+        #     'CarSpeed': self.speed,
+        #     'CarAngle': self.angle / 360,
+        #     'TireAngle': self.tire_angle / self.max_tire_angle
+        # ]
 
     def set_speed(self, speed: float) -> None:
         """
