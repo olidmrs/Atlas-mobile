@@ -59,12 +59,13 @@ class Car:
         self.wheelebase = front_tire_relative_position.y - back_right_tire_relative_position.y
 
         # Initialize
+        self.pixels_per_cm = self.track.car_dimensions.y / self.body_length
         self._initialize()
         self.reward = 5
 
     def _initialize(self) -> None:
         self.speed = 0
-        self.position = self.track.get_start_position()
+        self.position = self.track.get_start_position() / self.pixels_per_cm
         self.angle = Car.UP_ANGLE
         self.tire_angle = 0
         self.reward = Car.START_REWARD
@@ -124,7 +125,7 @@ class Car:
         angle : float
             A float between -1 and 1, which will be mapped to the maximum turn angle.
         """
-        self.front_tire_angle = angle * self.max_tire_angle
+        self.tire_angle = angle * self.max_tire_angle
 
     def update(self) -> None:
         """
@@ -135,13 +136,13 @@ class Car:
         """
 
         # Calculate the turning radius
-        turning_radius = abs(self.wheelebase / math.tan(math.radians(self.front_tire_angle)))
+        turning_radius = abs(self.wheelebase / math.tan(math.radians(self.tire_angle)))
 
         # Calculate Instantaneous Center of Rotation (ICR)
         center_of_back_wheels = self.position + (self.back_left_tire_position + self.back_right_tire_position) / 2
 
         # If tire angle is positive, subtract 180 and add the absolute value of angle
-        if self.tire_angle > 0:
+        if self.tire_angle >= 0:
             angle_facing_center_of_rotation = self.angle - (Car.MAX_CAR_ANGLE / 2) + self.tire_angle
         # If tire angle is negative, add 180 and subtract absolute value of angle
         else:
@@ -231,7 +232,6 @@ class Car:
         return self.reward
     
     def check_if_terminated(self) -> bool:
-        print(self._is_in_track())
         return not self._is_in_track() or self.reward <= 0
     
     def check_if_done(self) -> bool:
@@ -244,10 +244,9 @@ class Car:
         half_car_dimensions = self.track.car_dimensions / 2
         half_car_dimensions.x, half_car_dimensions.y = int(half_car_dimensions.x), int(half_car_dimensions.y)
         # Get car position in the pixel indices
-        pixels_per_cm = self.track.car_dimensions.y / self.body_length
         car_position_in_pixels = Vector(
-            int(self.position.x * pixels_per_cm),
-            int(len(self.track.pixels) - (self.position.y * pixels_per_cm) - 1)
+            int(self.position.x * self.pixels_per_cm),
+            int(len(self.track.pixels) - (self.position.y * self.pixels_per_cm) - 1)
         )
 
         for x_offset in (-self.track.car_dimensions.x // 2, self.track.car_dimensions.x // 2):
@@ -267,10 +266,9 @@ class Car:
         half_car_dimensions = self.track.car_dimensions / 2
         half_car_dimensions.x, half_car_dimensions.y = int(half_car_dimensions.x), int(half_car_dimensions.y)
         # Get car position in the pixel indices
-        pixels_per_cm = self.track.car_dimensions.y / self.body_length
         car_position_in_pixels = Vector(
-            int(self.position.x * pixels_per_cm),
-            int(len(self.track.pixels) - (self.position.y * pixels_per_cm) - 1)
+            int(self.position.x * self.pixels_per_cm),
+            int(len(self.track.pixels) - (self.position.y * self.pixels_per_cm) - 1)
         )
 
         for x_offset in range(-self.track.car_dimensions.x // 2, self.track.car_dimensions.x // 2+1):
