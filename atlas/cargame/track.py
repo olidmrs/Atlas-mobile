@@ -5,7 +5,7 @@ class Track:
             self,
             pixels : np.ndarray
     ):
-        pass
+        self.pixels = pixels
     
     def get_start_position(self) -> Vector:
         pass
